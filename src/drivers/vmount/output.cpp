@@ -46,6 +46,7 @@
 #include <uORB/topics/vehicle_global_position.h>
 #include <uORB/topics/mount_orientation.h>
 #include <px4_defines.h>
+#include <px4_posix.h>
 #include <geo/geo.h>
 #include <math.h>
 #include <mathlib/mathlib.h>
@@ -206,7 +207,17 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 	//get the output angles and stabilize if necessary
 	vehicle_attitude_s vehicle_attitude;
 
-	if (_stabilize[0] || _stabilize[1] || _stabilize[2]) {
+	if (is_stabilizing()) {
+		// This is the synchronization point when stabilizing: we want to minimize latency between the vehicle attitude
+		// being published and the output being updated.  Note that we don't care whether poll succeeds or not, we
+		// need the current attitude whether or not it's changed.
+
+		px4_pollfd_struct_t polls[1];
+		polls[0].fd = _vehicle_attitude_sub;
+		polls[0].events = POLLIN;
+
+		const int timeout_ms = 10;
+		px4_poll(polls, 1, timeout_ms);
 		orb_copy(ORB_ID(vehicle_attitude), _vehicle_attitude_sub, &vehicle_attitude);
 	}
 

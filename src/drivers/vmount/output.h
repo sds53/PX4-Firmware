@@ -94,6 +94,9 @@ public:
 	/** Publish _angle_outputs as a mount_orientation message. */
 	void publish();
 
+	/** True if any channel has stabilization enabled (and therefore update waits for an attitude update). */
+	inline bool is_stabilizing() {return _stabilize[0] || _stabilize[1] || _stabilize[2];}
+
 protected:
 	float _calculate_pitch(double lon, double lat, float altitude,
 			       const vehicle_global_position_s &global_position);

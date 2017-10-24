@@ -249,7 +249,6 @@ static int vmount_thread_main(int argc, char *argv[])
 	g_thread_data = &thread_data;
 
 	int last_active = 0;
-	hrt_abstime last_output_update = 0;
 
 	while (!thread_should_exit) {
 
@@ -359,40 +358,40 @@ static int vmount_thread_main(int argc, char *argv[])
 
 			for (int i = 0; i < thread_data.input_objs_len; ++i) {
 
-				bool already_active = (last_active == i);
+				bool this_input_already_active = (last_active == i);
 
 				ControlData *control_data_to_check = nullptr;
-				unsigned int poll_timeout = already_active ? 50 : 0; // poll only on active input to reduce latency
-				int ret = thread_data.input_objs[i]->update(poll_timeout, &control_data_to_check, already_active);
+
+				// This is the synchronization point when not stabilizing: we want to minimize latency between receiving
+				// input and updating output.  When stabilization is enabled, the output will block instead.  When there
+				// are multiple inputs, poll only the active input (and check the others without blocking) to reduce
+				// latency.
+				unsigned int poll_timeout = 1;
+				if (this_input_already_active && !thread_data.output_obj->is_stabilizing()) poll_timeout = 50;
+				int ret = thread_data.input_objs[i]->update(poll_timeout, &control_data_to_check, this_input_already_active);
 
 				if (ret) {
 					PX4_ERR("failed to read input %i (ret: %i)", i, ret);
 					continue;
 				}
 
-				if (control_data_to_check != nullptr || already_active) {
+				if (control_data_to_check != nullptr || this_input_already_active) {
 					control_data = control_data_to_check;
 					last_active = i;
 				}
 			}
 
-			hrt_abstime now = hrt_absolute_time();
-			if (now - last_output_update > 10000) { // rate-limit the update of outputs
-				last_output_update = now;
-
-				//update output
-				int ret = thread_data.output_obj->update(control_data);
-
-				if (ret) {
-					PX4_ERR("failed to write output (%i)", ret);
-					break;
-				}
-
-				thread_data.output_obj->publish();
+			//update output
+			int ret = thread_data.output_obj->update(control_data);
+			if (ret) {
+				PX4_ERR("failed to write output (%i)", ret);
+				break;
 			}
+			thread_data.output_obj->publish();
+
 
 		} else {
-			//wait for parameter changes. We still need to wake up regularily to check for thread exit requests
+			//wait for parameter changes. We still need to wake up regularly to check for thread exit requests
 			usleep(1e6);
 		}
 

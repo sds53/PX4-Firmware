@@ -75,12 +75,14 @@ int OutputMavlink::update(const ControlData *control_data)
 		.target_component = (uint8_t)_config.mavlink_comp_id,
 	};
 
+	hrt_abstime now = hrt_absolute_time();
+
 	if (control_data) {
 		//got new command
 		_set_angle_setpoints(control_data);
 
 		vehicle_command.command = vehicle_command_s::VEHICLE_CMD_DO_MOUNT_CONFIGURE;
-		vehicle_command.timestamp = hrt_absolute_time();
+		vehicle_command.timestamp = now;
 
 		if (control_data->type == ControlData::Type::Neutral) {
 			vehicle_command.param1 = vehicle_command_s::VEHICLE_MOUNT_MODE_NEUTRAL;
@@ -97,6 +99,9 @@ int OutputMavlink::update(const ControlData *control_data)
 					       vehicle_command_s::ORB_QUEUE_LENGTH);
 		}
 
+	} else if (now - _last_update < 10000) {
+		// If we don't have a new command and have updated recently, skip this update
+		return 0;
 	}
 
 	if (!_vehicle_command_pub) {
@@ -105,10 +110,9 @@ int OutputMavlink::update(const ControlData *control_data)
 
 	_handle_position_update();
 
-	hrt_abstime t = hrt_absolute_time();
-	_calculate_output_angles(t);
+	_calculate_output_angles(now);
 
-	vehicle_command.timestamp = t;
+	vehicle_command.timestamp = now;
 	vehicle_command.command = vehicle_command_s::VEHICLE_CMD_DO_MOUNT_CONTROL;
 
 	// vmount spec has roll, pitch on channels 0, 1, respectively; MAVLink spec has roll, pitch on channels 1, 0, respectively
@@ -119,7 +123,7 @@ int OutputMavlink::update(const ControlData *control_data)
 
 	orb_publish(ORB_ID(vehicle_command), _vehicle_command_pub, &vehicle_command);
 
-	_last_update = t;
+	_last_update = now;
 
 	return 0;
 }

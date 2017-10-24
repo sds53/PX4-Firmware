@@ -60,19 +60,26 @@ OutputRC::~OutputRC()
 
 int OutputRC::update(const ControlData *control_data)
 {
+	hrt_abstime now = hrt_absolute_time();
+
 	if (control_data) {
 		//got new command
 		_retract_gimbal = control_data->gimbal_shutter_retract;
 		_set_angle_setpoints(control_data);
+
+	} else if (!is_stabilizing() && now - _last_update < 10000) {
+		// If we're not stabilizing, don't have a new command and have updated recently, skip this update.
+		// If we are stabilizing, then outputs are published at the vehicle_attitude update rate (and the PWM driver
+		// will take the most recent value when it updates).
+		return 0;
 	}
 
 	_handle_position_update();
 
-	hrt_abstime t = hrt_absolute_time();
-	_calculate_output_angles(t);
+	_calculate_output_angles(now);
 
 	actuator_controls_s actuator_controls;
-	actuator_controls.timestamp = hrt_absolute_time();
+	actuator_controls.timestamp = now;
 	// _angle_outputs are in radians, actuator_controls are in [-1, 1]
 	actuator_controls.control[0] = (_angle_outputs[0] + _config.roll_offset) * _config.roll_scale;
 	actuator_controls.control[1] = (_angle_outputs[1] + _config.pitch_offset) * _config.pitch_scale;
@@ -83,7 +90,7 @@ int OutputRC::update(const ControlData *control_data)
 	orb_publish_auto(ORB_ID(actuator_controls_2), &_actuator_controls_pub, &actuator_controls,
 			 &instance, ORB_PRIO_DEFAULT);
 
-	_last_update = t;
+	_last_update = now;
 
 	return 0;
 }
