@@ -57,7 +57,8 @@ struct ControlData {
 	enum class Type : uint8_t {
 		Neutral = 0,      /**< move to neutral position */
 		Angle,            /**< control the roll, pitch & yaw angle directly */
-		LonLat            /**< control via lon, lat */
+		LonLat,            /**< control via lon, lat */
+		AngleGradient
 		//TODO: add more, like smooth curve, ... ?
 	};
 
@@ -69,6 +70,12 @@ struct ControlData {
 
 			bool is_speed[3];        /**< if true, the angle is the angular speed in rad/s */
 		} angle;
+
+		struct TypeAngleGradient {
+			float pitch;
+			float gradient;
+			float initial_altitude;
+		} angle_gradient;
 
 		struct TypeLonLat {
 			double lon;              /**< longitude in [deg] */
