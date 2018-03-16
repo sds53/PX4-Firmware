@@ -280,10 +280,24 @@ int InputMavlinkCmdMount::update_impl(unsigned int timeout_ms, ControlData **con
 
 				case vehicle_command_s::VEHICLE_MOUNT_MODE_GPS_POINT:
 					control_data_set_lon_lat((double)vehicle_command.param2, (double)vehicle_command.param1, vehicle_command.param3);
-
 					*control_data = &_control_data;
 					break;
+                case 1000:
+
+                    _control_data.type = ControlData::Type::AngleGradient;
+                    //TODO Store control data
+                    //TODO Store current altitude
+
+                    // vmount spec has pitch on channel 1, MAVLink spec has roll on channel 1
+                    _control_data.type_data.angle_gradient.pitch = vehicle_command.param1 * M_DEG_TO_RAD_F;
+					_control_data.type_data.angle_gradient.gradient = vehicle_command.param5;
+					_control_data.type_data.angle_gradient.initial_altitude = vehicle_command.param4;
+
+
+                    *control_data = &_control_data;
+                    break;
 				}
+
 
 				_ack_vehicle_command(&vehicle_command);
 

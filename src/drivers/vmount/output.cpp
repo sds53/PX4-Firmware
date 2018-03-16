@@ -42,8 +42,8 @@
 #include <errno.h>
 
 #include <uORB/topics/vehicle_attitude.h>
-#include <uORB/topics/vehicle_attitude.h>
 #include <uORB/topics/vehicle_global_position.h>
+#include <uORB/topics/vehicle_local_position.h>
 #include <uORB/topics/mount_orientation.h>
 #include <px4_defines.h>
 #include <px4_posix.h>
@@ -70,6 +70,10 @@ OutputBase::~OutputBase()
 		orb_unsubscribe(_vehicle_global_position_sub);
 	}
 
+	if (_vehicle_local_position_sub >= 0) {
+		orb_unsubscribe(_vehicle_global_position_sub);
+	}
+
 	if (_mount_orientation_pub) {
 		orb_unadvertise(_mount_orientation_pub);
 	}
@@ -82,6 +86,10 @@ int OutputBase::initialize()
 	}
 
 	if ((_vehicle_global_position_sub = orb_subscribe(ORB_ID(vehicle_global_position))) < 0) {
+		return -errno;
+	}
+
+	if ((_vehicle_global_position_sub = orb_subscribe(ORB_ID(vehicle_local_position))) < 0) {
 		return -errno;
 	}
 
@@ -153,6 +161,15 @@ void OutputBase::_set_angle_setpoints(const ControlData *control_data)
 		_angle_setpoints[1] = 0.f;
 		_angle_setpoints[2] = 0.f;
 		break;
+
+    case ControlData::Type::AngleGradient:
+        // TODO Angle calculation
+	    vehicle_local_position_s vehicle_local_position;
+		orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
+		float altitude_factor = control_data->type_data.angle_gradient.gradient;
+		// This might need to change because NED vs ENU?
+		_angle_setpoints[1] = control_data->type_data.angle_gradient.pitch + (vehicle_local_position.z - control_data->type_data.angle_gradient.initial_altitude) * altitude_factor;
+        break;
 	}
 }
 
