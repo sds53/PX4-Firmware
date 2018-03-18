@@ -282,7 +282,7 @@ int InputMavlinkCmdMount::update_impl(unsigned int timeout_ms, ControlData **con
 					control_data_set_lon_lat((double)vehicle_command.param2, (double)vehicle_command.param1, vehicle_command.param3);
 					*control_data = &_control_data;
 					break;
-                case 1000:
+                case 255:
 
                     _control_data.type = ControlData::Type::AngleGradient;
                     //TODO Store control data
