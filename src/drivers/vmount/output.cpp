@@ -89,7 +89,7 @@ int OutputBase::initialize()
 		return -errno;
 	}
 
-	if ((_vehicle_global_position_sub = orb_subscribe(ORB_ID(vehicle_local_position))) < 0) {
+	if ((_vehicle_local_position_sub = orb_subscribe(ORB_ID(vehicle_local_position))) < 0) {
 		return -errno;
 	}
 

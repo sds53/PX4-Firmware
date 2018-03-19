@@ -284,16 +284,13 @@ int InputMavlinkCmdMount::update_impl(unsigned int timeout_ms, ControlData **con
 					break;
                 case 255:
 
-                    _control_data.type = ControlData::Type::AngleGradient;
-                    //TODO Store control data
-                    //TODO Store current altitude
+					// Store control data, current altitude
+	                _control_data.type = ControlData::Type::AngleGradient;
 
                     // vmount spec has pitch on channel 1, MAVLink spec has roll on channel 1
                     _control_data.type_data.angle_gradient.pitch = vehicle_command.param1 * M_DEG_TO_RAD_F;
 					_control_data.type_data.angle_gradient.gradient = vehicle_command.param5;
 					_control_data.type_data.angle_gradient.initial_altitude = vehicle_command.param4;
-
-
                     *control_data = &_control_data;
                     break;
 				}
