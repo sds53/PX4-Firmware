@@ -163,15 +163,14 @@ void OutputBase::_set_angle_setpoints(const ControlData *control_data)
 		break;
 
     case ControlData::Type::AngleGradient:
-//        // TODO Angle calculation
-	    vehicle_local_position_s vehicle_local_position;
-		orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
-		float altitude_factor = control_data->type_data.angle_gradient.gradient;
-		// This might need to change because NED vs ENU?
-		_angle_setpoints[0] = 0.f;
-		_angle_setpoints[1] = control_data->type_data.angle_gradient.pitch + (vehicle_local_position.z - control_data->type_data.angle_gradient.initial_altitude) * altitude_factor;
-		PX4_INFO("Original %.3f, New %.3f\n", (double)control_data->type_data.angle_gradient.pitch, (double)_angle_setpoints[1]);
-//		_angle_setpoints[2] = 0.f;
+// 	    vehicle_local_position_s vehicle_local_position;
+// 		orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
+// 		float altitude_factor = control_data->type_data.angle_gradient.gradient;
+// 		// This might need to change because NED vs ENU?
+// 		_angle_setpoints[0] = 0.f;
+// 		_angle_setpoints[1] = control_data->type_data.angle_gradient.pitch + (vehicle_local_position.z - control_data->type_data.angle_gradient.initial_altitude) * altitude_factor;
+// 		PX4_INFO("Original %.3f, New %.3f\n", (double)control_data->type_data.angle_gradient.pitch, (double)_angle_setpoints[1]);
+// //		_angle_setpoints[2] = 0.f;
 		break;
 	}
 }
