@@ -163,15 +163,15 @@ void OutputBase::_set_angle_setpoints(const ControlData *control_data)
 		break;
 
     case ControlData::Type::AngleGradient:
-        // TODO Angle calculation
-	    vehicle_local_position_s vehicle_local_position;
-		orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
-		float altitude_factor = control_data->type_data.angle_gradient.gradient;
-		// This might need to change because NED vs ENU?
-		_angle_setpoints[0] = 0.f;
-		_angle_setpoints[1] = control_data->type_data.angle_gradient.pitch + (vehicle_local_position.z - control_data->type_data.angle_gradient.initial_altitude) * altitude_factor;
-		PX4_INFO((vehicle_local_position.z - control_data->type_data.angle_gradient.initial_altitude) * altitude_factor);
-		_angle_setpoints[2] = 0.f;
+//        // TODO Angle calculation
+//	    vehicle_local_position_s vehicle_local_position;
+//		orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
+//		float altitude_factor = control_data->type_data.angle_gradient.gradient;
+//		// This might need to change because NED vs ENU?
+//		_angle_setpoints[0] = 0.f;
+//		_angle_setpoints[1] = control_data->type_data.angle_gradient.pitch + (vehicle_local_position.z - control_data->type_data.angle_gradient.initial_altitude) * altitude_factor;
+//		PX4_INFO((vehicle_local_position.z - control_data->type_data.angle_gradient.initial_altitude) * altitude_factor);
+//		_angle_setpoints[2] = 0.f;
 		break;
 	}
 }
@@ -241,6 +241,20 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 		orb_copy(ORB_ID(vehicle_attitude), _vehicle_attitude_sub, &vehicle_attitude);
 	}
 
+	if (_cur_control_data->type == ControlData::Type::AngleGradient) {
+		vehicle_local_position_s vehicle_local_position;
+		orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
+		float altitude_factor = _cur_control_data->type_data.angle_gradient.gradient;
+		// This might need to change because NED vs ENU?
+		_angle_setpoints[0] = 0.f;
+
+		float change_in_altitude =
+				vehicle_local_position.z - _cur_control_data->type_data.angle_gradient.initial_altitude;
+		_angle_setpoints[1] = _cur_control_data->type_data.angle_gradient.pitch + change_in_altitude * altitude_factor;
+		//PX4_INFO((vehicle_local_position.z - control_data->type_data.angle_gradient.initial_altitude) * altitude_factor);
+		_angle_setpoints[2] = 0.f;
+	}
+	
 	matrix::Eulerf euler = matrix::Quatf(vehicle_attitude.q);
 
 	for (int i = 0; i < 3; ++i) {
