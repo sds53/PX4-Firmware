@@ -251,10 +251,11 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 		float change_in_altitude =
 				vehicle_local_position.z - _cur_control_data->type_data.angle_gradient.initial_altitude;
 		_angle_setpoints[1] = _cur_control_data->type_data.angle_gradient.pitch + change_in_altitude * altitude_factor;
+		PX4_INFO("original %.3f, new %.3f\n", (double)_cur_control_data->type_data.angle_gradient.pitch, (double) _angle_setpoints[1]);
 		//PX4_INFO((vehicle_local_position.z - control_data->type_data.angle_gradient.initial_altitude) * altitude_factor);
 		_angle_setpoints[2] = 0.f;
 	}
-	
+
 	matrix::Eulerf euler = matrix::Quatf(vehicle_attitude.q);
 
 	for (int i = 0; i < 3; ++i) {
@@ -273,4 +274,3 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 }
 
 } /* namespace vmount */
-
