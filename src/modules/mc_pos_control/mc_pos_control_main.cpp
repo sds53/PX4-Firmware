@@ -212,9 +212,12 @@ private:
 		param_t slow_land_alt1;
 		param_t slow_land_alt2;
 		param_t xy_p;
-		param_t xy_vel_p;
-		param_t xy_vel_i;
-		param_t xy_vel_d;
+		param_t x_vel_p;
+		param_t y_vel_p;
+		param_t x_vel_i;
+		param_t y_vel_i;
+		param_t x_vel_d;
+		param_t y_vel_d;
 		param_t xy_vel_max;
 		param_t xy_vel_cruise;
 		param_t tilt_max_air;
@@ -517,10 +520,12 @@ MulticopterPositionControl::MulticopterPositionControl() :
 	_params_handles.z_vel_max_up	= param_find("MPC_Z_VEL_MAX_UP");
 	_params_handles.z_vel_max_down	= param_find("MPC_Z_VEL_MAX_DN");
 	_params_handles.xy_p		= param_find("MPC_XY_P");
-	// TODO Get both
-	_params_handles.xy_vel_p	= param_find("MPC_XY_VEL_P");
-	_params_handles.xy_vel_i	= param_find("MPC_XY_VEL_I");
-	_params_handles.xy_vel_d	= param_find("MPC_XY_VEL_D");
+	_params_handles.x_vel_p	= param_find("MPC_X_VEL_P");
+	_params_handles.y_vel_p	= param_find("MPC_Y_VEL_P");
+	_params_handles.x_vel_i	= param_find("MPC_X_VEL_I");
+	_params_handles.y_vel_i	= param_find("MPC_Y_VEL_I");
+	_params_handles.x_vel_d	= param_find("MPC_X_VEL_D");
+	_params_handles.y_vel_d	= param_find("MPC_Y_VEL_D");
 	_params_handles.xy_vel_max	= param_find("MPC_XY_VEL_MAX");
 	_params_handles.xy_vel_cruise	= param_find("MPC_XY_CRUISE");
 	_params_handles.slow_land_alt1  = param_find("MPC_LAND_ALT1");
@@ -613,21 +618,21 @@ MulticopterPositionControl::parameters_update(bool force)
 		_params.pos_p(1) = v;
 		param_get(_params_handles.z_p, &v);
 		_params.pos_p(2) = v;
-		// TODO Get both
-		param_get(_params_handles.xy_vel_p, &v);
+		param_get(_params_handles.x_vel_p, &v);
 		_params.vel_p(0) = v;
+		param_get(_params_handles.y_vel_p, &v);
 		_params.vel_p(1) = v;
 		param_get(_params_handles.z_vel_p, &v);
 		_params.vel_p(2) = v;
-		// TODO Get both
-		param_get(_params_handles.xy_vel_i, &v);
+		param_get(_params_handles.x_vel_i, &v);
 		_params.vel_i(0) = v;
+		param_get(_params_handles.y_vel_i, &v);
 		_params.vel_i(1) = v;
 		param_get(_params_handles.z_vel_i, &v);
 		_params.vel_i(2) = v;
-		// TODO Get both
-		param_get(_params_handles.xy_vel_d, &v);
+		param_get(_params_handles.x_vel_d, &v);
 		_params.vel_d(0) = v;
+		param_get(_params_handles.y_vel_d, &v);
 		_params.vel_d(1) = v;
 		param_get(_params_handles.z_vel_d, &v);
 		_params.vel_d(2) = v;
