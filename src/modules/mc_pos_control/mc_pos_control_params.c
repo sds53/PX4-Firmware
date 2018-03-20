@@ -196,6 +196,8 @@ PARAM_DEFINE_FLOAT(MPC_Z_VEL_MAX_DN, 1.0f);
  */
 PARAM_DEFINE_FLOAT(MPC_XY_P, 0.95f);
 
+// TODO Define both
+
 /**
  * Proportional gain for horizontal velocity error
  *
