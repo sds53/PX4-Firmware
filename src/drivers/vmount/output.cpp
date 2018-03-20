@@ -168,8 +168,11 @@ void OutputBase::_set_angle_setpoints(const ControlData *control_data)
 		orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
 		float altitude_factor = control_data->type_data.angle_gradient.gradient;
 		// This might need to change because NED vs ENU?
+		_angle_setpoints[0] = 0.f;
 		_angle_setpoints[1] = control_data->type_data.angle_gradient.pitch + (vehicle_local_position.z - control_data->type_data.angle_gradient.initial_altitude) * altitude_factor;
-        break;
+		PX4_INFO((vehicle_local_position.z - control_data->type_data.angle_gradient.initial_altitude) * altitude_factor);
+		_angle_setpoints[2] = 0.f;
+		break;
 	}
 }
 
