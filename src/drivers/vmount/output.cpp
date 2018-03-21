@@ -240,11 +240,6 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 	}
 
 	if (_cur_control_data->type == ControlData::Type::AngleGradient) {
-		px4_pollfd_struct_t polls[1];
-		polls[0].fd = _vehicle_local_position_sub;
-		polls[0].events = POLLIN;
-		const int timeout_ms = 10;
-		px4_poll(polls, 1, timeout_ms);
 
 		vehicle_local_position_s vehicle_local_position;
 		orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
@@ -257,7 +252,6 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 		_correction = (double) sams_correction;
 		_angle_setpoints[0] = 0.f;
 		_angle_setpoints[1] = sams_correction;
-//		_angle_setpoints[1] = _cur_control_data->type_data.angle_gradient.pitch - sams_correction;
 		_angle_setpoints[2] = 0.f;
 	}
 
