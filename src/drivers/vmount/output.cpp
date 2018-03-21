@@ -258,7 +258,7 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 		if (_correction < 15) {
 			_correction += 1.f;
 		}
-		_correction = change_in_altitude * altitude_factor;
+//		_correction = change_in_altitude * altitude_factor;
 //		_angle_setpoints[1] = _cur_control_data->type_data.angle_gradient.pitch + change_in_altitude * altitude_factor;
 		_angle_setpoints[1] = _cur_control_data->type_data.angle_gradient.pitch + (float)((double)_correction * M_DEG_TO_RAD);
 		_angle_setpoints[2] = 0.f;
