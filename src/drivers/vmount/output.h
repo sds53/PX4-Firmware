@@ -114,6 +114,7 @@ protected:
 	const ControlData *_cur_control_data = nullptr;
 	float _angle_setpoints[3] = { 0.f, 0.f, 0.f }; ///< [rad]
 	double _correction = 0.0;
+	float hz;
 	float _angle_speeds[3] = { 0.f, 0.f, 0.f };
 	bool _stabilize[3] = { false, false, false };
 

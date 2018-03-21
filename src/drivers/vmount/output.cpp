@@ -167,7 +167,7 @@ void OutputBase::_set_angle_setpoints(const ControlData *control_data)
 //			orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
 //			float altitude_factor = _cur_control_data->type_data.angle_gradient.gradient;
 //
-		PX4_INFO("Correction %.3f", (double) _correction * M_RAD_TO_DEG);
+		PX4_INFO("Time %.3f", (double) hz);
 //			PX4_INFO("Gradient %.3f, Altitude: %.3f", (double)altitude_factor, (double)_change_in_alt);
 //		_setpoint_angle = control_data->type_data.angle_gradient.pitch;
 		break;
@@ -217,6 +217,7 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 {
 	//take speed into account
 	float dt = (t - _last_update) / 1.e6f;
+	hz = 1.0 / (double)dt;
 
 	for (int i = 0; i < 3; ++i) {
 		_angle_setpoints[i] += dt * _angle_speeds[i];
