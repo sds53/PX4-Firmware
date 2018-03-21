@@ -113,11 +113,6 @@ protected:
 
 	const ControlData *_cur_control_data = nullptr;
 	float _angle_setpoints[3] = { 0.f, 0.f, 0.f }; ///< [rad]
-	// TODO: remove this
-	float _setpoint_angle = 0.f;
-	float _change_in_alt = 0.f;
-	float _correction = 0.f;
-	// TODO: remove above this
 	float _angle_speeds[3] = { 0.f, 0.f, 0.f };
 	bool _stabilize[3] = { false, false, false };
 

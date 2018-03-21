@@ -163,13 +163,13 @@ void OutputBase::_set_angle_setpoints(const ControlData *control_data)
 		break;
 
     case ControlData::Type::AngleGradient:
-	    vehicle_local_position_s vehicle_local_position;
-			orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
-			float altitude_factor = _cur_control_data->type_data.angle_gradient.gradient;
-
-		PX4_INFO("Setpoint %.3f, Adjusted %.3f, Correction %.3f", (double)_setpoint_angle * M_RAD_TO_DEG, (double) _angle_setpoints[1] * M_RAD_TO_DEG, (double) _correction * M_RAD_TO_DEG);
-			PX4_INFO("Gradient %.3f, Altitude: %.3f", (double)altitude_factor, (double)_change_in_alt);
-		_setpoint_angle = control_data->type_data.angle_gradient.pitch;
+//	    vehicle_local_position_s vehicle_local_position;
+//			orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
+//			float altitude_factor = _cur_control_data->type_data.angle_gradient.gradient;
+//
+//		PX4_INFO("Setpoint %.3f, Adjusted %.3f, Correction %.3f", (double)_setpoint_angle * M_RAD_TO_DEG, (double) _angle_setpoints[1] * M_RAD_TO_DEG, (double) _correction * M_RAD_TO_DEG);
+//			PX4_INFO("Gradient %.3f, Altitude: %.3f", (double)altitude_factor, (double)_change_in_alt);
+//		_setpoint_angle = control_data->type_data.angle_gradient.pitch;
 		break;
 	}
 }
@@ -250,12 +250,10 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 		orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
 		float altitude_factor = _cur_control_data->type_data.angle_gradient.gradient;
 
-		float change_in_altitude = vehicle_local_position.z - _cur_control_data->type_data.angle_gradient.initial_altitude;
-		_change_in_alt = change_in_altitude;
+		double change_in_altitude = vehicle_local_position.z - _cur_control_data->type_data.angle_gradient.initial_altitude;
 
-		double dist = altitude_factor;
-		float sams_correction = atan2(dist * tan(_cur_control_data->type_data.angle_gradient.pitch) - (double)change_in_altitude, dist);
-		_correction = sams_correction;
+		double distance_from_branch = altitude_factor; // This is now distance from branch
+		float sams_correction = atan2(distance_from_branch * tan(_cur_control_data->type_data.angle_gradient.pitch) - (double)change_in_altitude, distance_from_branch);
 		_angle_setpoints[0] = 0.f;
 		_angle_setpoints[1] = _cur_control_data->type_data.angle_gradient.pitch - sams_correction;
 		_angle_setpoints[2] = 0.f;
