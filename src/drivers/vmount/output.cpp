@@ -240,6 +240,12 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 	}
 
 	if (_cur_control_data->type == ControlData::Type::AngleGradient) {
+		px4_pollfd_struct_t polls[1];
+		polls[0].fd = _vehicle_local_position_sub;
+		polls[0].events = POLLIN;
+		const int timeout_ms = 10;
+		px4_poll(polls, 1, timeout_ms);
+
 		vehicle_local_position_s vehicle_local_position;
 		orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
 		float altitude_factor = _cur_control_data->type_data.angle_gradient.gradient;
@@ -249,8 +255,8 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 				vehicle_local_position.z - _cur_control_data->type_data.angle_gradient.initial_altitude;
 		_change_in_alt = change_in_altitude;
 		_correction = change_in_altitude * altitude_factor;
-//		_angle_setpoints[1] = _cur_control_data->type_data.angle_gradient.pitch + change_in_altitude * altitude_factor;
-		_angle_setpoints[1] = _cur_control_data->type_data.angle_gradient.pitch + (float)(15.0 * M_DEG_TO_RAD);
+		_angle_setpoints[1] = _cur_control_data->type_data.angle_gradient.pitch + change_in_altitude * altitude_factor;
+//		_angle_setpoints[1] = _cur_control_data->type_data.angle_gradient.pitch + (float)(15.0 * M_DEG_TO_RAD);
 		_angle_setpoints[2] = 0.f;
 	}
 
