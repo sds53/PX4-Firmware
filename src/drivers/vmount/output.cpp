@@ -253,10 +253,10 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 		double change_in_altitude = vehicle_local_position.z - _cur_control_data->type_data.angle_gradient.initial_altitude;
 
 		double distance_from_branch = altitude_factor; // This is now distance from branch
-		float sams_correction = atan2(distance_from_branch * tan(_cur_control_data->type_data.angle_gradient.pitch) - change_in_altitude, distance_from_branch);
+		float sams_correction = atan2(distance_from_branch * tan(_cur_control_data->type_data.angle_gradient.pitch) + change_in_altitude, distance_from_branch);
 		_correction = (double) sams_correction;
 		_angle_setpoints[0] = 0.f;
-		_angle_setpoints[1] = -sams_correction;
+		_angle_setpoints[1] = sams_correction;
 //		_angle_setpoints[1] = _cur_control_data->type_data.angle_gradient.pitch - sams_correction;
 		_angle_setpoints[2] = 0.f;
 	}
