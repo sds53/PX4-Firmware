@@ -257,7 +257,7 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 		float sams_correction = atan2(dist * tan(_cur_control_data->type_data.angle_gradient.pitch) - (double)change_in_altitude, dist);
 		_correction = sams_correction;
 		_angle_setpoints[0] = 0.f;
-		_angle_setpoints[1] = _cur_control_data->type_data.angle_gradient.pitch + sams_correction;
+		_angle_setpoints[1] = _cur_control_data->type_data.angle_gradient.pitch - sams_correction;
 		_angle_setpoints[2] = 0.f;
 	}
 
