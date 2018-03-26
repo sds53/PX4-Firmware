@@ -163,13 +163,6 @@ void OutputBase::_set_angle_setpoints(const ControlData *control_data)
 		break;
 
     case ControlData::Type::AngleGradient:
-//	    vehicle_local_position_s vehicle_local_position;
-//			orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
-//			float altitude_factor = _cur_control_data->type_data.angle_gradient.gradient;
-//
-		PX4_INFO("Time %.3f", (double) hz);
-//			PX4_INFO("Gradient %.3f, Altitude: %.3f", (double)altitude_factor, (double)_change_in_alt);
-//		_setpoint_angle = control_data->type_data.angle_gradient.pitch;
 		break;
 	}
 }
@@ -244,15 +237,14 @@ void OutputBase::_calculate_output_angles(const hrt_abstime &t)
 
 		vehicle_local_position_s vehicle_local_position;
 		orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &vehicle_local_position);
-		float altitude_factor = _cur_control_data->type_data.angle_gradient.gradient;
-
 		double change_in_altitude = vehicle_local_position.z - _cur_control_data->type_data.angle_gradient.initial_altitude;
 
-		double distance_from_branch = altitude_factor; // This is now distance from branch
-		float sams_correction = atan2(distance_from_branch * tan(_cur_control_data->type_data.angle_gradient.pitch) + change_in_altitude, distance_from_branch);
-		_correction = (double) sams_correction;
+		// TODO: Change type_data to use distance_from_branch instead of gradient
+		double distance_from_branch = _cur_control_data->type_data.angle_gradient.gradient; // This is now distance from branch
+		float corrected_pitch = atan2(distance_from_branch * tan(_cur_control_data->type_data.angle_gradient.pitch) + change_in_altitude, distance_from_branch);
+		_correction = (double) corrected_pitch;
 		_angle_setpoints[0] = 0.f;
-		_angle_setpoints[1] = sams_correction;
+		_angle_setpoints[1] = corrected_pitch;
 		_angle_setpoints[2] = 0.f;
 	}
 
