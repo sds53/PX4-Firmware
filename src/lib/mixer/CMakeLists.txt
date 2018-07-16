@@ -36,6 +36,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 set(geometry_files
 	quad_x.toml
 	quad_h.toml
+	quad_h_prototype.toml
 	quad_plus.toml
 	quad_wide.toml
 	quad_deadcat.toml
