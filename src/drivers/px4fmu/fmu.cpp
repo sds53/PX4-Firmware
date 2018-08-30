@@ -1330,7 +1330,7 @@ PX4FMU::cycle()
 				}
 
 				/* overwrite outputs in case of lockdown with disarmed PWM values */
-				if (_armed.lockdown || _armed.manual_lockdown) {
+				if (_armed.lockdown || _armed.manual_lockdown || !_armed.armed) {
 					for (size_t i = 0; i < mixed_num_outputs; i++) {
 						pwm_limited[i] = _disarmed_pwm[i];
 					}
