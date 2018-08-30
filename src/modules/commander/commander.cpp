@@ -2241,7 +2241,7 @@ Commander::run()
 
 			/* DISARM
 			 * check if left stick is in lower left position or arm button is pushed or arm switch has transition from arm to disarm
-			 * and we are in MANUAL, Rattitude, or AUTO_READY mode or (ASSIST mode and landed)
+			 * and we are in MANUAL, OFFBOARD, Rattitude, or AUTO_READY mode or (ASSIST mode and landed)
 			 * do it only for rotary wings in manual mode or fixed wing if landed */
 			const bool stick_in_lower_left = sp_man.r < -STICK_ON_OFF_LIMIT && sp_man.z < 0.1f;
 			const bool arm_switch_to_disarm_transition =  arm_switch_is_button == 0 &&
@@ -2257,6 +2257,7 @@ Commander::run()
 				    internal_state.main_state != commander_state_s::MAIN_STATE_ACRO &&
 				    internal_state.main_state != commander_state_s::MAIN_STATE_STAB &&
 				    internal_state.main_state != commander_state_s::MAIN_STATE_RATTITUDE &&
+				    internal_state.main_state != commander_state_s::MAIN_STATE_OFFBOARD &&
 				    !land_detector.landed) {
 					print_reject_arm("NOT DISARMING: Not in manual mode or landed yet.");
 
@@ -2275,7 +2276,7 @@ Commander::run()
 
 			/* ARM
 			 * check if left stick is in lower right position or arm button is pushed or arm switch has transition from disarm to arm
-			 * and we're in MANUAL mode */
+			 * and we're in MANUAL or OFFBOARD mode */
 			const bool stick_in_lower_right = (sp_man.r > STICK_ON_OFF_LIMIT && sp_man.z < 0.1f);
 			const bool arm_switch_to_arm_transition = arm_switch_is_button == 0 &&
 					_last_sp_man_arm_switch == manual_control_setpoint_s::SWITCH_POS_OFF &&
@@ -2297,6 +2298,7 @@ Commander::run()
 					    && (internal_state.main_state != commander_state_s::MAIN_STATE_ALTCTL)
 					    && (internal_state.main_state != commander_state_s::MAIN_STATE_POSCTL)
 					    && (internal_state.main_state != commander_state_s::MAIN_STATE_RATTITUDE)
+					    && (internal_state.main_state != commander_state_s::MAIN_STATE_OFFBOARD)
 					   ) {
 						print_reject_arm("NOT ARMING: Switch to a manual mode first.");
 
