@@ -381,9 +381,9 @@ MulticopterAttitudeControl::control_attitude(float dt)
 
 	 // HACKING FROM HERE ON
 	if (_v_control_mode.flag_control_offboard_enabled) {
-	  math::Vector<3> current_state_euler = q.to_euler();
-	  math::Vector<3> sp_euler = q_sp.to_euler();
-	  qd.from_euler(sp_euler(0), sp_euler(1), current_state_euler(2));
+	  Eulerf current_euler(q);
+	  Eulerf desired_euler(qd);
+	  qd = Quatf(Eulerf(desired_euler.phi(), desired_euler.theta(), current_euler.psi()));
 	}
 
 	/* ensure input quaternions are exactly normalized because acosf(1.00001) == NaN */
