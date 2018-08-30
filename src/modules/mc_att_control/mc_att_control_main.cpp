@@ -379,6 +379,13 @@ MulticopterAttitudeControl::control_attitude(float dt)
 	Quatf q(_v_att.q);
 	Quatf qd(_v_att_sp.q_d);
 
+	 // HACKING FROM HERE ON
+	if (_v_control_mode.flag_control_offboard_enabled) {
+	  math::Vector<3> current_state_euler = q.to_euler();
+	  math::Vector<3> sp_euler = q_sp.to_euler();
+	  qd.from_euler(sp_euler(0), sp_euler(1), current_state_euler(2));
+	}
+
 	/* ensure input quaternions are exactly normalized because acosf(1.00001) == NaN */
 	q.normalize();
 	qd.normalize();
@@ -440,6 +447,12 @@ MulticopterAttitudeControl::control_attitude(float dt)
 			_rates_sp(i) = math::constrain(_rates_sp(i), -_mc_rate_max(i), _mc_rate_max(i));
 		}
 	}
+
+	// ugly hack to get yaw rate
+    if (_v_control_mode.flag_control_offboard_enabled) {
+		vehicle_rates_setpoint_poll();
+		_rates_sp(2) = _v_rates_sp.yaw;
+    }
 
 	/* VTOL weather-vane mode, dampen yaw rate */
 	if (_vehicle_status.is_vtol && _v_att_sp.disable_mc_yaw_control) {
@@ -695,13 +708,15 @@ MulticopterAttitudeControl::run()
 				_v_rates_sp.thrust = _thrust_sp;
 				_v_rates_sp.timestamp = hrt_absolute_time();
 
-				if (_v_rates_sp_pub != nullptr) {
-					orb_publish(_rates_sp_id, _v_rates_sp_pub, &_v_rates_sp);
+				// Don't republish if in offboard mode, since we send the yaw rate here.
+		        if (!_v_control_mode.flag_control_offboard_enabled) {
+		  				if (_v_rates_sp_pub != nullptr) {
+		  					orb_publish(_rates_sp_id, _v_rates_sp_pub, &_v_rates_sp);
 
-				} else if (_rates_sp_id) {
-					_v_rates_sp_pub = orb_advertise(_rates_sp_id, &_v_rates_sp);
-				}
-
+		  				} else if (_rates_sp_id) {
+		  					_v_rates_sp_pub = orb_advertise(_rates_sp_id, &_v_rates_sp);
+		  				}
+		        }
 			} else {
 				/* attitude controller disabled, poll rates setpoint topic */
 				if (_v_control_mode.flag_control_manual_enabled) {
