@@ -2,6 +2,9 @@
 
 ## See https://github.com/PX4/Firmware for the original
 
+## Use case
+
+This px4 fork is designed to work with the [mav_control_rw](https://github.com/ethz-asl/mav_control_rw) ros nodes in combination with our hacked [mavros version](https://github.com/ethz-asl/mavros)
 ## Changes
 
 ### Filtering
