@@ -8,9 +8,8 @@ adis16448 start
 
 if [ $? == 0 ]
 then
-	set ADIS_FOUND 1
-else
-	set ADIS_FOUND 0
+	set ADIS_FOUND true
+	param set SENS_EN_THERMAL 0
 fi
 
 if ver hwcmp AEROFC_V1 OMNIBUS_F4SD
