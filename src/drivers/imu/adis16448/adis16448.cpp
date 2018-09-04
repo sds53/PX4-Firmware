@@ -159,7 +159,7 @@
 #define BITS_FIR_128_TAP_CFG	(7<<0)
 
 
-#define ADIS16448_GYRO_DEFAULT_RATE					250
+#define ADIS16448_GYRO_DEFAULT_RATE					250	
 #define ADIS16448_GYRO_DEFAULT_DRIVER_FILTER_FREQ	100
 
 #define ADIS16448_ACCEL_DEFAULT_RATE				250
@@ -1427,9 +1427,10 @@ ADIS16448::measure()
 	gyro_report		grb;
 	mag_report		mrb;
 
-	// found through kalibr
-	const int CONSTANT_DELAY = 1600;
-	grb.timestamp = arb.timestamp = mrb.timestamp = hrt_absolute_time() - CONSTANT_DELAY;
+	//fonud with kalibr
+	const int TIME_OFFSET_HACK = -4000;
+
+	grb.timestamp = arb.timestamp = mrb.timestamp = hrt_absolute_time() + TIME_OFFSET_HACK;
 	grb.error_count = arb.error_count = mrb.error_count = perf_event_count(_bad_transfers);
 
 	/* Gyro report: */
