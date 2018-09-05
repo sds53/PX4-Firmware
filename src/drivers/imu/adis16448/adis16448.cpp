@@ -159,13 +159,13 @@
 #define BITS_FIR_128_TAP_CFG	(7<<0)
 
 
-#define ADIS16448_GYRO_DEFAULT_RATE					250	
+#define ADIS16448_GYRO_DEFAULT_RATE					204	
 #define ADIS16448_GYRO_DEFAULT_DRIVER_FILTER_FREQ	100
 
-#define ADIS16448_ACCEL_DEFAULT_RATE				250
+#define ADIS16448_ACCEL_DEFAULT_RATE				204
 #define ADIS16448_ACCEL_DEFAULT_DRIVER_FILTER_FREQ	100
 
-#define ADIS16448_MAG_DEFAULT_RATE					250
+#define ADIS16448_MAG_DEFAULT_RATE					204
 #define ADIS16448_MAG_DEFAULT_DRIVER_FILTER_FREQ	30
 
 #define ADIS16448_ACCEL_MAX_OUTPUT_RATE              1221
@@ -1395,6 +1395,18 @@ ADIS16448::measure()
 
 	adis_report.cmd = ((ADIS16448_GLOB_CMD | DIR_READ) << 8) & 0xff00;
 
+	/*
+	 * Report buffers.
+	 */
+	accel_report	arb;
+	gyro_report		grb;
+	mag_report		mrb;
+
+	//found with kalibr
+	const int TIME_OFFSET_HACK = -4000;
+
+	grb.timestamp = arb.timestamp = mrb.timestamp = hrt_absolute_time() + TIME_OFFSET_HACK;
+
 	if (OK != transferhword((uint16_t *)&adis_report, ((uint16_t *)&adis_report), sizeof(adis_report) / sizeof(uint16_t))) {
 		return -EIO;
 	}
@@ -1420,17 +1432,6 @@ ADIS16448::measure()
 		return -EIO;
 	}
 
-	/*
-	 * Report buffers.
-	 */
-	accel_report	arb;
-	gyro_report		grb;
-	mag_report		mrb;
-
-	//fonud with kalibr
-	const int TIME_OFFSET_HACK = -4000;
-
-	grb.timestamp = arb.timestamp = mrb.timestamp = hrt_absolute_time() + TIME_OFFSET_HACK;
 	grb.error_count = arb.error_count = mrb.error_count = perf_event_count(_bad_transfers);
 
 	/* Gyro report: */
