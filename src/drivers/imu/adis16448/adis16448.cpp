@@ -723,7 +723,7 @@ int ADIS16448::reset()
 	_set_gyro_dyn_range(GYROINITIALSENSITIVITY);
 
 	/* Set digital FIR filter tap */
-	_set_dlpf_filter(BITS_FIR_NO_TAP_CFG);
+	_set_dlpf_filter(BITS_FIR_16_TAP_CFG);
 
 	/* Set IMU sample rate */
 	_set_sample_rate(_sample_rate);
@@ -1402,10 +1402,7 @@ ADIS16448::measure()
 	gyro_report		grb;
 	mag_report		mrb;
 
-	//found with kalibr
-	const int TIME_OFFSET_HACK = -4000;
-
-	grb.timestamp = arb.timestamp = mrb.timestamp = hrt_absolute_time() + TIME_OFFSET_HACK;
+	grb.timestamp = arb.timestamp = mrb.timestamp = hrt_absolute_time();
 
 	if (OK != transferhword((uint16_t *)&adis_report, ((uint16_t *)&adis_report), sizeof(adis_report) / sizeof(uint16_t))) {
 		return -EIO;

@@ -1953,10 +1953,13 @@ MPU6000::measure()
 	accel_report	arb;
 	gyro_report		grb;
 
+	//found with kalibr
+	const int TIME_OFFSET_HACK = -4000;
+
 	/*
 	 * Adjust and scale results to m/s^2.
 	 */
-	grb.timestamp = arb.timestamp = hrt_absolute_time();
+	grb.timestamp = arb.timestamp = hrt_absolute_time() + TIME_OFFSET_HACK;
 
 	// report the error count as the sum of the number of bad
 	// transfers and bad register reads. This allows the higher
