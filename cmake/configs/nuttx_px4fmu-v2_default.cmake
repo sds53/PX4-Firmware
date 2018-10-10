@@ -19,7 +19,7 @@ set(config_module_list
 	#drivers/barometer/bmp280
 	#drivers/bst
 	drivers/camera_trigger
-	#drivers/frsky_telemetry
+	drivers/telemetry/frsky_telemetry
 	drivers/gps
 	#drivers/hott
 	#drivers/iridiumsbd
@@ -36,7 +36,7 @@ set(config_module_list
 	#drivers/protocol_splitter
 	drivers/pwm_input
 	#drivers/pwm_out_sim
-	drivers/px4flow
+	#drivers/px4flow
 	drivers/px4fmu
 	drivers/px4io
 	drivers/rgbled
