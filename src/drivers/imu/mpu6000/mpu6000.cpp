@@ -1953,13 +1953,10 @@ MPU6000::measure()
 	accel_report	arb;
 	gyro_report		grb;
 
-	//found with kalibr
-	const int TIME_OFFSET_HACK = -4000;
-
 	/*
 	 * Adjust and scale results to m/s^2.
 	 */
-	grb.timestamp = arb.timestamp = hrt_absolute_time() + TIME_OFFSET_HACK;
+	grb.timestamp = arb.timestamp = hrt_absolute_time();
 
 	// report the error count as the sum of the number of bad
 	// transfers and bad register reads. This allows the higher
@@ -2000,9 +1997,9 @@ MPU6000::measure()
 	float y_in_new = ((yraw_f * _accel_range_scale) - _accel_scale.y_offset) * _accel_scale.y_scale;
 	float z_in_new = ((zraw_f * _accel_range_scale) - _accel_scale.z_offset) * _accel_scale.z_scale;
 
-	arb.x = x_in_new;//_accel_filter_x.apply(x_in_new);
-	arb.y = y_in_new;//_accel_filter_y.apply(y_in_new);
-	arb.z = z_in_new;//_accel_filter_z.apply(z_in_new);
+	arb.x = _accel_filter_x.apply(x_in_new);
+	arb.y = _accel_filter_y.apply(y_in_new);
+	arb.z = _accel_filter_z.apply(z_in_new);
 
 	matrix::Vector3f aval(x_in_new, y_in_new, z_in_new);
 	matrix::Vector3f aval_integrated;
@@ -2043,9 +2040,9 @@ MPU6000::measure()
 	float y_gyro_in_new = ((yraw_f * _gyro_range_scale) - _gyro_scale.y_offset) * _gyro_scale.y_scale;
 	float z_gyro_in_new = ((zraw_f * _gyro_range_scale) - _gyro_scale.z_offset) * _gyro_scale.z_scale;
 
-	grb.x = x_gyro_in_new;//_gyro_filter_x.apply(x_gyro_in_new);
-	grb.y = y_gyro_in_new;//_gyro_filter_y.apply(y_gyro_in_new);
-	grb.z = z_gyro_in_new;//_gyro_filter_z.apply(z_gyro_in_new);
+	grb.x = _gyro_filter_x.apply(x_gyro_in_new);
+	grb.y = _gyro_filter_y.apply(y_gyro_in_new);
+	grb.z = _gyro_filter_z.apply(z_gyro_in_new);
 
 	matrix::Vector3f gval(x_gyro_in_new, y_gyro_in_new, z_gyro_in_new);
 	matrix::Vector3f gval_integrated;
