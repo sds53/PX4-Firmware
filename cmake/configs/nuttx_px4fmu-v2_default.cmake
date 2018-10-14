@@ -12,14 +12,14 @@ set(config_module_list
 	#drivers/magnetometer
 	#drivers/telemetry
 
-	#drivers/imu/adis16448
+	drivers/imu/adis16448
 	drivers/barometer/ms5611
 	#drivers/blinkm
 	#drivers/imu/bmi160
 	#drivers/barometer/bmp280
 	#drivers/bst
 	drivers/camera_trigger
-	#drivers/frsky_telemetry
+	drivers/telemetry/frsky_telemetry
 	drivers/gps
 	#drivers/hott
 	#drivers/iridiumsbd
@@ -36,7 +36,7 @@ set(config_module_list
 	#drivers/protocol_splitter
 	drivers/pwm_input
 	#drivers/pwm_out_sim
-	drivers/px4flow
+	#drivers/px4flow
 	drivers/px4fmu
 	drivers/px4io
 	drivers/rgbled
@@ -52,8 +52,8 @@ set(config_module_list
 	drivers/distance_sensor/sf0x
 	drivers/distance_sensor/sf1xx
 	drivers/distance_sensor/srf02
-	drivers/distance_sensor/teraranger
-	drivers/distance_sensor/tfmini
+	#drivers/distance_sensor/teraranger
+	#drivers/distance_sensor/tfmini
 	#drivers/distance_sensor/ulanding
 	modules/sensors
 

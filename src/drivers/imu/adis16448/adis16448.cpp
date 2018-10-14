@@ -159,13 +159,13 @@
 #define BITS_FIR_128_TAP_CFG	(7<<0)
 
 
-#define ADIS16448_GYRO_DEFAULT_RATE					250
-#define ADIS16448_GYRO_DEFAULT_DRIVER_FILTER_FREQ	30
+#define ADIS16448_GYRO_DEFAULT_RATE					204	
+#define ADIS16448_GYRO_DEFAULT_DRIVER_FILTER_FREQ	100
 
-#define ADIS16448_ACCEL_DEFAULT_RATE				250
-#define ADIS16448_ACCEL_DEFAULT_DRIVER_FILTER_FREQ	30
+#define ADIS16448_ACCEL_DEFAULT_RATE				204
+#define ADIS16448_ACCEL_DEFAULT_DRIVER_FILTER_FREQ	100
 
-#define ADIS16448_MAG_DEFAULT_RATE					250
+#define ADIS16448_MAG_DEFAULT_RATE					204
 #define ADIS16448_MAG_DEFAULT_DRIVER_FILTER_FREQ	30
 
 #define ADIS16448_ACCEL_MAX_OUTPUT_RATE              1221
@@ -176,7 +176,7 @@
 #define SPI_BUS_SPEED								1000000
 #define T_STALL										9
 
-#define GYROINITIALSENSITIVITY						250
+#define GYROINITIALSENSITIVITY						1000
 #define ACCELINITIALSENSITIVITY						(1.0f / 1200.0f)
 #define MAGINITIALSENSITIVITY						(1.0f / 7.0f)
 #define ACCELDYNAMICRANGE							18.0f
@@ -774,9 +774,9 @@ ADIS16448::probe()
 void
 ADIS16448::_set_sample_rate(uint16_t desired_sample_rate_hz)
 {
-	uint16_t smpl_prd = 0;
+	uint16_t smpl_prd = BITS_SMPL_PRD_NO_TAP_CFG;
 
-	if (desired_sample_rate_hz <= 51) {
+	/*if (desired_sample_rate_hz <= 51) {
 		smpl_prd = BITS_SMPL_PRD_16_TAP_CFG;
 
 	} else if (desired_sample_rate_hz <= 102) {
@@ -790,7 +790,7 @@ ADIS16448::_set_sample_rate(uint16_t desired_sample_rate_hz)
 
 	} else {
 		smpl_prd = BITS_SMPL_PRD_NO_TAP_CFG;
-	}
+	}*/
 
 	modify_reg16(ADIS16448_SMPL_PRD, 0x1f00, smpl_prd);
 
@@ -1395,6 +1395,15 @@ ADIS16448::measure()
 
 	adis_report.cmd = ((ADIS16448_GLOB_CMD | DIR_READ) << 8) & 0xff00;
 
+	/*
+	 * Report buffers.
+	 */
+	accel_report	arb;
+	gyro_report		grb;
+	mag_report		mrb;
+
+	grb.timestamp = arb.timestamp = mrb.timestamp = hrt_absolute_time();
+
 	if (OK != transferhword((uint16_t *)&adis_report, ((uint16_t *)&adis_report), sizeof(adis_report) / sizeof(uint16_t))) {
 		return -EIO;
 	}
@@ -1420,14 +1429,6 @@ ADIS16448::measure()
 		return -EIO;
 	}
 
-	/*
-	 * Report buffers.
-	 */
-	accel_report	arb;
-	gyro_report		grb;
-	mag_report		mrb;
-
-	grb.timestamp = arb.timestamp = mrb.timestamp = hrt_absolute_time();
 	grb.error_count = arb.error_count = mrb.error_count = perf_event_count(_bad_transfers);
 
 	/* Gyro report: */

@@ -3,6 +3,8 @@
 # Standard startup script for sensor drivers.
 #
 
+frsky_telemetry start
+
 # ADIS16448
 adis16448 start
 
