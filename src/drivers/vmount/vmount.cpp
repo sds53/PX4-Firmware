@@ -383,12 +383,13 @@ static int vmount_thread_main(int argc, char *argv[])
 
 			//update output
 			int ret = thread_data.output_obj->update(control_data);
+
 			if (ret) {
 				PX4_ERR("failed to write output (%i)", ret);
 				break;
 			}
-			thread_data.output_obj->publish();
 
+			thread_data.output_obj->publish();
 
 		} else {
 			//wait for parameter changes. We still need to wake up regularly to check for thread exit requests
